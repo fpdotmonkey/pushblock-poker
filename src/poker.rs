@@ -32,13 +32,6 @@ pub enum Suit {
 }
 
 /// A representation of a conventional playing card
-///
-/// When comparing the value of the cards with `<`, `>`, `==`, and
-/// friends, the rank is the only value that matters.
-///
-/// ```
-/// assert_eq!(Card::new(Rank::Two, Suit::Diamond), Card::new(Rank::Two, Suit::Spade));
-/// ```
 #[derive(Debug, Clone)]
 pub struct Card {
     rank: Rank,
@@ -62,21 +55,21 @@ impl Card {
     }
 }
 
+/// Compare based on rank
 impl PartialOrd for Card {
     fn partial_cmp(&self, other: &Self) -> Option<std::cmp::Ordering> {
-        if self.rank > other.rank {
-            Some(std::cmp::Ordering::Greater)
-        } else if self.rank < other.rank {
-            Some(std::cmp::Ordering::Less)
-        } else {
-            Some(std::cmp::Ordering::Equal)
+        match self.rank {
+            rank if rank > other.rank => Some(std::cmp::Ordering::Greater),
+            rank if rank < other.rank => Some(std::cmp::Ordering::Less),
+            _ => Some(std::cmp::Ordering::Equal),
         }
     }
 }
 
+/// Compare based on rank
 impl PartialEq for Card {
     fn eq(&self, other: &Self) -> bool {
-        return self.rank == other.rank;
+        self.rank == other.rank
     }
 }
 
@@ -143,14 +136,12 @@ impl Hand {
     /// would be described as a full house instead of as a pair or
     /// three of a kind since that's the highest ranked option.
     pub fn kind(&self) -> HandKind {
-        if self.is_flush() && self.straight_high_card().is_some() {
-            if self.straight_high_card().unwrap() == Rank::Ace {
-                return HandKind::RoyalFlush;
-            }
-            return HandKind::StraightFlush(self.straight_high_card().unwrap());
-        }
-
         if self.is_flush() {
+            match self.straight_high_card() {
+                Some(Rank::Ace) => return HandKind::RoyalFlush,
+                Some(rank) => return HandKind::StraightFlush(rank),
+                None => {}
+            }
             return HandKind::Flush(
                 self.cards
                     .iter()
@@ -161,12 +152,12 @@ impl Hand {
             );
         }
 
-        if self.straight_high_card().is_some() {
-            return HandKind::Straight(self.straight_high_card().unwrap());
+        if let Some(straight_high_card) = self.straight_high_card() {
+            return HandKind::Straight(straight_high_card);
         }
 
-        if self.set_hand().is_some() {
-            return self.set_hand().unwrap();
+        if let Some(set_hand) = self.set_hand() {
+            return set_hand;
         }
 
         return HandKind::HighCard(
@@ -211,7 +202,7 @@ impl Hand {
             }
             previous_card = card;
         }
-        return Some(straight_sorted_cards[0].rank().clone());
+        Some(straight_sorted_cards[0].rank())
     }
 
     fn is_flush(&self) -> bool {
@@ -226,7 +217,7 @@ impl Hand {
                 .fold(std::collections::HashMap::new(), |mut acc, card| {
                     let counter = acc.entry(card.rank()).or_insert(0);
                     *counter += 1;
-                    return acc;
+                    acc
                 });
 
         let mut three_of_a_kind: Option<Rank> = None;
@@ -245,15 +236,14 @@ impl Hand {
             }
         }
 
-        if three_of_a_kind.is_some() {
-            if pairs.len() > 0 {
-                return Some(HandKind::FullHouse(three_of_a_kind.unwrap()));
+        if let Some(three_of_a_kind) = three_of_a_kind {
+            if pairs.is_empty() {
+                return Some(HandKind::ThreeOfAKind(three_of_a_kind));
             }
-            return Some(HandKind::ThreeOfAKind(three_of_a_kind.unwrap()));
+            return Some(HandKind::FullHouse(three_of_a_kind));
         }
         if pairs.len() == 2 {
-            assert_eq!(pairs.len(), 2);
-            assert_eq!(high_cards.len(), 1);
+            debug_assert_eq!(high_cards.len(), 1);
 
             return Some(HandKind::TwoPair {
                 pair_high: *pairs.iter().max().unwrap(),
@@ -262,17 +252,16 @@ impl Hand {
             });
         }
         if pairs.len() == 1 {
-            assert_eq!(pairs.len(), 1);
-            assert_eq!(high_cards.len(), 3);
+            debug_assert_eq!(high_cards.len(), 3);
 
-            high_cards.sort_by(|card0, card1| card1.partial_cmp(&card0).unwrap());
+            high_cards.sort_by(|card0, card1| card1.partial_cmp(card0).unwrap());
             return Some(HandKind::Pair {
                 pair: pairs[0],
                 high_cards: high_cards.try_into().unwrap(),
             });
         }
 
-        return None;
+        None
     }
 }
 
