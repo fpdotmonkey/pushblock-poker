@@ -1,6 +1,7 @@
 # rust
-/target
+/rust/target/
 Cargo.lock
 
 # godot
-/.import
+/godot/.import/
+/godot/.godot/

@@ -16,16 +16,16 @@ use crate::coordinate;
 /// The primary interface for querying and updating the game state
 #[derive(Debug, Clone, PartialEq)]
 pub struct Sokoban {
-    you: coordinate::U2,
-    stops: coordinate::U2Array,
-    pushes: coordinate::U2Array,
-    targets: coordinate::U2Array,
+    you: coordinate::I2,
+    stops: coordinate::I2Array,
+    pushes: coordinate::I2Array,
+    targets: coordinate::I2Array,
 }
 
 impl Sokoban {
     /// Construct a new sokoban board
     ///
-    /// In cases where a `coordinate::U2` is used, the first value is
+    /// In cases where a `coordinate::I2` is used, the first value is
     /// understood as the horizontal coordinate to the right, and the
     /// second value is the vertical coordinate down.
     ///
@@ -43,15 +43,15 @@ impl Sokoban {
     /// //    |^|
     /// //    ---
     ///
-    /// let you: coordinate::U2 = coordinate::U2::new(4, 4);
-    /// let stops: coordinate::U2Array = coordinate::U2Array::from(vec![
+    /// let you: coordinate::I2 = coordinate::I2::new(4, 4);
+    /// let stops: coordinate::I2Array = coordinate::I2Array::from(vec![
     ///     [2, 0], [3, 0], [4, 0], [2, 1], [4, 1], [2, 2], [4, 2],
     ///     [5, 2], [6, 2], [7, 2], [0, 3], [1, 3], [2, 3], [7, 3],
     ///     [0, 4], [5, 4], [6, 4], [7, 4], [0, 5], [1, 5], [2, 5],
     ///     [3, 5], [5, 5], [3, 6], [5, 6], [3, 7], [4, 7], [5, 7],
     /// ]);
-    /// let pushes: coordinate::U2Array = coordinate::U2Array::from(vec![[3, 3], [5, 3], [3, 4], [4, 5]]);
-    /// let targets: coordinate::U2Array = coordinate::U2Array::from(vec![[3, 1], [6, 3], [1, 4], [4, 6]]);
+    /// let pushes: coordinate::I2Array = coordinate::I2Array::from(vec![[3, 3], [5, 3], [3, 4], [4, 5]]);
+    /// let targets: coordinate::I2Array = coordinate::I2Array::from(vec![[3, 1], [6, 3], [1, 4], [4, 6]]);
     ///
     /// let board: Sokoban = Sokoban::new(you, stops.clone(), pushes.clone(), targets.clone());
     ///
@@ -87,10 +87,10 @@ impl Sokoban {
     /// #     .all_targets_triggered());
     /// ```
     pub fn new(
-        you: coordinate::U2,
-        stops: coordinate::U2Array,
-        pushes: coordinate::U2Array,
-        targets: coordinate::U2Array,
+        you: coordinate::I2,
+        stops: coordinate::I2Array,
+        pushes: coordinate::I2Array,
+        targets: coordinate::I2Array,
     ) -> Self {
         Sokoban {
             you,
@@ -124,16 +124,16 @@ impl Sokoban {
     /// # //    |^|
     /// # //    ---
     /// #
-    /// let you: coordinate::U2 = coordinate::U2::new(4, 4);
+    /// let you: coordinate::I2 = coordinate::I2::new(4, 4);
     /// // ...
-    /// # let stops: coordinate::U2Array = coordinate::U2Array::from(vec![
+    /// # let stops: coordinate::I2Array = coordinate::I2Array::from(vec![
     /// #     [2, 0], [3, 0], [4, 0], [2, 1], [4, 1], [2, 2], [4, 2],
     /// #     [5, 2], [6, 2], [7, 2], [0, 3], [1, 3], [2, 3], [7, 3],
     /// #     [0, 4], [5, 4], [6, 4], [7, 4], [0, 5], [1, 5], [2, 5],
     /// #     [3, 5], [5, 5], [3, 6], [5, 6], [3, 7], [4, 7], [5, 7],
     /// # ]);
-    /// # let pushes: coordinate::U2Array = coordinate::U2Array::from(vec![[3, 3], [5, 3], [3, 4], [4, 5]]);
-    /// # let targets: coordinate::U2Array = coordinate::U2Array::from(vec![[3, 1], [6, 3], [1, 4], [4, 6]]);
+    /// # let pushes: coordinate::I2Array = coordinate::I2Array::from(vec![[3, 3], [5, 3], [3, 4], [4, 5]]);
+    /// # let targets: coordinate::I2Array = coordinate::I2Array::from(vec![[3, 1], [6, 3], [1, 4], [4, 6]]);
     /// #
     /// let board: Sokoban = Sokoban::new(you, stops.clone(), pushes.clone(), targets.clone());
     ///
@@ -169,9 +169,9 @@ impl Sokoban {
     /// #     .all_targets_triggered());
     /// ```
     pub fn you_move(&self, direction: coordinate::Direction) -> Sokoban {
-        let mut moving_pushes: coordinate::U2Array = coordinate::U2Array::from(vec![]);
+        let mut moving_pushes: coordinate::I2Array = coordinate::I2Array::from(vec![]);
         for i in 1.. {
-            let test_coordinate: Option<coordinate::U2> = self.you.nudge_by(i, direction);
+            let test_coordinate: Option<coordinate::I2> = self.you.nudge_by(i, direction);
             if test_coordinate.is_none() || self.stops.contains(&test_coordinate.unwrap()) {
                 return Sokoban::new(
                     self.you,
@@ -181,7 +181,7 @@ impl Sokoban {
                 );
             }
 
-            let test_coordinate: coordinate::U2 = test_coordinate.unwrap();
+            let test_coordinate: coordinate::I2 = test_coordinate.unwrap();
 
             if self.pushes.contains(&test_coordinate) {
                 moving_pushes.push(test_coordinate);
@@ -190,8 +190,8 @@ impl Sokoban {
             }
         }
 
-        let new_you: coordinate::U2 = self.you.nudge(direction).unwrap();
-        let new_pushes: coordinate::U2Array = self
+        let new_you: coordinate::I2 = self.you.nudge(direction).unwrap();
+        let new_pushes: coordinate::I2Array = self
             .pushes
             .iter()
             .map(|push| {
@@ -227,15 +227,15 @@ impl Sokoban {
     /// # //    |^|
     /// # //    ---
     /// #
-    /// # let you: coordinate::U2 = [4, 4];
-    /// # let stops: coordinate::U2Array = coordinate::U2Array::from(vec![
+    /// # let you: coordinate::I2 = [4, 4];
+    /// # let stops: coordinate::I2Array = coordinate::I2Array::from(vec![
     /// #     [2, 0], [3, 0], [4, 0], [2, 1], [4, 1], [2, 2], [4, 2],
     /// #     [5, 2], [6, 2], [7, 2], [0, 3], [1, 3], [2, 3], [7, 3],
     /// #     [0, 4], [5, 4], [6, 4], [7, 4], [0, 5], [1, 5], [2, 5],
     /// #     [3, 5], [5, 5], [3, 6], [5, 6], [3, 7], [4, 7], [5, 7],
     /// # ]);
-    /// # let pushes: coordinate::U2Array = coordinate::U2Array::from(vec![[3, 3], [5, 3], [3, 4], [4, 5]]);
-    /// let targets: coordinate::U2Array = coordinate::U2Array::from(vec![[3, 1], [6, 3], [1, 4], [4, 6]]);
+    /// # let pushes: coordinate::I2Array = coordinate::I2Array::from(vec![[3, 3], [5, 3], [3, 4], [4, 5]]);
+    /// let targets: coordinate::I2Array = coordinate::I2Array::from(vec![[3, 1], [6, 3], [1, 4], [4, 6]]);
     /// // ...
     /// #
     /// let board: Sokoban = Sokoban::new(you, stops.clone(), pushes.clone(), targets.clone());
@@ -271,11 +271,11 @@ impl Sokoban {
     /// #     .you_move(coordinate::Direction::Right)
     /// #     .all_targets_triggered());
     /// ```
-    pub fn triggered_targets(&self) -> Vec<&coordinate::U2> {
+    pub fn triggered_targets(&self) -> Vec<&coordinate::I2> {
         self.targets
             .iter()
             .filter(|target| self.pushes.contains(target))
-            .collect::<Vec<&coordinate::U2>>()
+            .collect::<Vec<&coordinate::I2>>()
     }
 
     /// Checks if all the targets have been triggered
@@ -294,15 +294,15 @@ impl Sokoban {
     /// //    |^|
     /// //    ---
     ///
-    /// # let you: coordinate::U2 = [4, 4];
-    /// # let stops: coordinate::U2Array = coordinate::U2Array::from(vec![
+    /// # let you: coordinate::I2 = [4, 4];
+    /// # let stops: coordinate::I2Array = coordinate::I2Array::from(vec![
     /// #     [2, 0], [3, 0], [4, 0], [2, 1], [4, 1], [2, 2], [4, 2],
     /// #     [5, 2], [6, 2], [7, 2], [0, 3], [1, 3], [2, 3], [7, 3],
     /// #     [0, 4], [5, 4], [6, 4], [7, 4], [0, 5], [1, 5], [2, 5],
     /// #     [3, 5], [5, 5], [3, 6], [5, 6], [3, 7], [4, 7], [5, 7],
     /// # ]);
-    /// # let pushes: coordinate::U2Array = coordinate::U2Array::from(vec![[3, 3], [5, 3], [3, 4], [4, 5]]);
-    /// # let targets: coordinate::U2Array = coordinate::U2Array::from(vec![[3, 1], [6, 3], [1, 4], [4, 6]]);
+    /// # let pushes: coordinate::I2Array = coordinate::I2Array::from(vec![[3, 3], [5, 3], [3, 4], [4, 5]]);
+    /// # let targets: coordinate::I2Array = coordinate::I2Array::from(vec![[3, 1], [6, 3], [1, 4], [4, 6]]);
     /// #
     /// let board: Sokoban = Sokoban::new(you, stops.clone(), pushes.clone(), targets.clone());
     ///
@@ -344,22 +344,22 @@ impl Sokoban {
     }
 
     /// Gets the position of the player
-    pub fn you(&self) -> coordinate::U2 {
+    pub fn you(&self) -> coordinate::I2 {
         self.you
     }
 
     /// Gets the positions of all the stopping collision
-    pub fn stops(&self) -> coordinate::U2Array {
+    pub fn stops(&self) -> coordinate::I2Array {
         self.stops.clone()
     }
 
     /// Gets the positions of all the pushable objects
-    pub fn pushes(&self) -> coordinate::U2Array {
+    pub fn pushes(&self) -> coordinate::I2Array {
         self.pushes.clone()
     }
 
     /// Gets the positions of all the targets for the pushable objects
-    pub fn targets(&self) -> coordinate::U2Array {
+    pub fn targets(&self) -> coordinate::I2Array {
         self.targets.clone()
     }
 }
@@ -375,15 +375,15 @@ mod tests {
         // ..+..
         // .0.+.
         // .^...
-        let you: coordinate::U2 = coordinate::U2::new(1, 1);
-        let stops: coordinate::U2Array = coordinate::U2Array::from(vec![[2, 2], [3, 3]]);
-        let pushes: coordinate::U2Array = coordinate::U2Array::from(vec![[3, 1], [1, 3]]);
-        let targets: coordinate::U2Array = coordinate::U2Array::from(vec![[4, 1], [1, 4]]);
+        let you: coordinate::I2 = coordinate::I2::new(1, 1);
+        let stops: coordinate::I2Array = coordinate::I2Array::from(vec![[2, 2], [3, 3]]);
+        let pushes: coordinate::I2Array = coordinate::I2Array::from(vec![[3, 1], [1, 3]]);
+        let targets: coordinate::I2Array = coordinate::I2Array::from(vec![[4, 1], [1, 4]]);
 
-        let you_up: coordinate::U2 = coordinate::U2::new(1, 0);
-        let you_left: coordinate::U2 = coordinate::U2::new(0, 1);
-        let you_down: coordinate::U2 = coordinate::U2::new(1, 2);
-        let you_right: coordinate::U2 = coordinate::U2::new(2, 1);
+        let you_up: coordinate::I2 = coordinate::I2::new(1, 0);
+        let you_left: coordinate::I2 = coordinate::I2::new(0, 1);
+        let you_down: coordinate::I2 = coordinate::I2::new(1, 2);
+        let you_right: coordinate::I2 = coordinate::I2::new(2, 1);
 
         let board: Sokoban = Sokoban::new(you, stops.clone(), pushes.clone(), targets.clone());
 
@@ -412,12 +412,12 @@ mod tests {
         // .0|@|0.
         // ...-...
         // ...0...
-        let you: coordinate::U2 = coordinate::U2::new(3, 3);
-        let stops: coordinate::U2Array =
-            coordinate::U2Array::from(vec![[3, 2], [2, 3], [3, 4], [4, 3]]);
-        let pushes: coordinate::U2Array =
-            coordinate::U2Array::from(vec![[3, 1], [1, 3], [3, 5], [5, 3]]);
-        let targets: coordinate::U2Array = coordinate::U2Array::from(vec![[6, 1], [7, 1]]);
+        let you: coordinate::I2 = coordinate::I2::new(3, 3);
+        let stops: coordinate::I2Array =
+            coordinate::I2Array::from(vec![[3, 2], [2, 3], [3, 4], [4, 3]]);
+        let pushes: coordinate::I2Array =
+            coordinate::I2Array::from(vec![[3, 1], [1, 3], [3, 5], [5, 3]]);
+        let targets: coordinate::I2Array = coordinate::I2Array::from(vec![[6, 1], [7, 1]]);
 
         let board: Sokoban =
             Sokoban::new(you.clone(), stops.clone(), pushes.clone(), targets.clone());
@@ -446,25 +446,25 @@ mod tests {
         // ..0@0..
         // ...0...
         // .......
-        let you: coordinate::U2 = coordinate::U2::new(3, 3);
-        let you_up: coordinate::U2 = coordinate::U2::new(3, 2);
-        let you_left: coordinate::U2 = coordinate::U2::new(2, 3);
-        let you_down: coordinate::U2 = coordinate::U2::new(3, 4);
-        let you_right: coordinate::U2 = coordinate::U2::new(4, 3);
+        let you: coordinate::I2 = coordinate::I2::new(3, 3);
+        let you_up: coordinate::I2 = coordinate::I2::new(3, 2);
+        let you_left: coordinate::I2 = coordinate::I2::new(2, 3);
+        let you_down: coordinate::I2 = coordinate::I2::new(3, 4);
+        let you_right: coordinate::I2 = coordinate::I2::new(4, 3);
 
-        let pushes: coordinate::U2Array =
-            coordinate::U2Array::from(vec![[3, 2], [2, 3], [3, 4], [4, 3]]);
-        let pushes_up: coordinate::U2Array =
-            coordinate::U2Array::from(vec![[3, 1], [2, 3], [3, 4], [4, 3]]);
-        let pushes_left: coordinate::U2Array =
-            coordinate::U2Array::from(vec![[3, 2], [1, 3], [3, 4], [4, 3]]);
-        let pushes_down: coordinate::U2Array =
-            coordinate::U2Array::from(vec![[3, 2], [2, 3], [3, 5], [4, 3]]);
-        let pushes_right: coordinate::U2Array =
-            coordinate::U2Array::from(vec![[3, 2], [2, 3], [3, 4], [5, 3]]);
+        let pushes: coordinate::I2Array =
+            coordinate::I2Array::from(vec![[3, 2], [2, 3], [3, 4], [4, 3]]);
+        let pushes_up: coordinate::I2Array =
+            coordinate::I2Array::from(vec![[3, 1], [2, 3], [3, 4], [4, 3]]);
+        let pushes_left: coordinate::I2Array =
+            coordinate::I2Array::from(vec![[3, 2], [1, 3], [3, 4], [4, 3]]);
+        let pushes_down: coordinate::I2Array =
+            coordinate::I2Array::from(vec![[3, 2], [2, 3], [3, 5], [4, 3]]);
+        let pushes_right: coordinate::I2Array =
+            coordinate::I2Array::from(vec![[3, 2], [2, 3], [3, 4], [5, 3]]);
 
-        let stops: coordinate::U2Array = coordinate::U2Array::from(vec![[1, 1], [2, 1]]);
-        let targets: coordinate::U2Array = coordinate::U2Array::from(vec![[6, 1], [7, 1]]);
+        let stops: coordinate::I2Array = coordinate::I2Array::from(vec![[1, 1], [2, 1]]);
+        let targets: coordinate::I2Array = coordinate::I2Array::from(vec![[6, 1], [7, 1]]);
 
         let board = Sokoban::new(you, stops.clone(), pushes.clone(), targets.clone());
 
@@ -509,14 +509,14 @@ mod tests {
         // ..0..
         // ..0..
         // ..@..
-        let you: coordinate::U2 = coordinate::U2::new(0, 5);
-        let you_final: coordinate::U2 = coordinate::U2::new(0, 4);
-        let pushes: coordinate::U2Array =
-            coordinate::U2Array::from(vec![[0, 1], [0, 2], [0, 3], [0, 4]]);
-        let pushes_final: coordinate::U2Array =
-            coordinate::U2Array::from(vec![[0, 0], [0, 1], [0, 2], [0, 3]]);
-        let stops: coordinate::U2Array = coordinate::U2Array::from(vec![]);
-        let targets: coordinate::U2Array = coordinate::U2Array::from(vec![]);
+        let you: coordinate::I2 = coordinate::I2::new(0, 5);
+        let you_final: coordinate::I2 = coordinate::I2::new(0, 4);
+        let pushes: coordinate::I2Array =
+            coordinate::I2Array::from(vec![[0, 1], [0, 2], [0, 3], [0, 4]]);
+        let pushes_final: coordinate::I2Array =
+            coordinate::I2Array::from(vec![[0, 0], [0, 1], [0, 2], [0, 3]]);
+        let stops: coordinate::I2Array = coordinate::I2Array::from(vec![]);
+        let targets: coordinate::I2Array = coordinate::I2Array::from(vec![]);
 
         assert_eq!(
             Sokoban::new(you, stops.clone(), pushes, targets.clone())
@@ -533,11 +533,11 @@ mod tests {
         // ..0..
         // ..0..
         // ..@..
-        let you: coordinate::U2 = coordinate::U2::new(0, 5);
-        let pushes: coordinate::U2Array =
-            coordinate::U2Array::from(vec![[0, 1], [0, 2], [0, 3], [0, 4]]);
-        let stops: coordinate::U2Array = coordinate::U2Array::from(vec![[0, 0]]);
-        let targets: coordinate::U2Array = coordinate::U2Array::from(vec![]);
+        let you: coordinate::I2 = coordinate::I2::new(0, 5);
+        let pushes: coordinate::I2Array =
+            coordinate::I2Array::from(vec![[0, 1], [0, 2], [0, 3], [0, 4]]);
+        let stops: coordinate::I2Array = coordinate::I2Array::from(vec![[0, 0]]);
+        let targets: coordinate::I2Array = coordinate::I2Array::from(vec![]);
 
         assert_eq!(
             Sokoban::new(you, stops.clone(), pushes.clone(), targets.clone())
@@ -550,10 +550,10 @@ mod tests {
         // ..0..
         // ..0..
         // ..@..
-        let you: coordinate::U2 = coordinate::U2::new(0, 4);
-        let pushes: coordinate::U2Array =
-            coordinate::U2Array::from(vec![[0, 0], [0, 1], [0, 2], [0, 3]]);
-        let targets: coordinate::U2Array = coordinate::U2Array::from(vec![]);
+        let you: coordinate::I2 = coordinate::I2::new(0, 4);
+        let pushes: coordinate::I2Array =
+            coordinate::I2Array::from(vec![[0, 0], [0, 1], [0, 2], [0, 3]]);
+        let targets: coordinate::I2Array = coordinate::I2Array::from(vec![]);
 
         assert_eq!(
             Sokoban::new(you, stops.clone(), pushes.clone(), targets.clone())
@@ -569,12 +569,12 @@ mod tests {
         // |0@0|
         // ..0..
         // ..-.^
-        let you: coordinate::U2 = coordinate::U2::new(2, 2);
-        let stops: coordinate::U2Array =
-            coordinate::U2Array::from(vec![[2, 0], [0, 2], [2, 4], [4, 2]]);
-        let pushes: coordinate::U2Array =
-            coordinate::U2Array::from(vec![[2, 1], [1, 2], [2, 3], [3, 2]]);
-        let targets: coordinate::U2Array = coordinate::U2Array::from(vec![[4, 4]]);
+        let you: coordinate::I2 = coordinate::I2::new(2, 2);
+        let stops: coordinate::I2Array =
+            coordinate::I2Array::from(vec![[2, 0], [0, 2], [2, 4], [4, 2]]);
+        let pushes: coordinate::I2Array =
+            coordinate::I2Array::from(vec![[2, 1], [1, 2], [2, 3], [3, 2]]);
+        let targets: coordinate::I2Array = coordinate::I2Array::from(vec![[4, 4]]);
 
         let board: Sokoban = Sokoban::new(you, stops.clone(), pushes.clone(), targets.clone());
         assert_eq!(
@@ -597,20 +597,20 @@ mod tests {
 
     #[test]
     fn integer_xflow_is_stop() {
-        let stops: coordinate::U2Array = coordinate::U2Array::from(vec![]);
-        let pushes: coordinate::U2Array = coordinate::U2Array::from(vec![]);
-        let targets: coordinate::U2Array = coordinate::U2Array::from(vec![]);
+        let stops: coordinate::I2Array = coordinate::I2Array::from(vec![]);
+        let pushes: coordinate::I2Array = coordinate::I2Array::from(vec![]);
+        let targets: coordinate::I2Array = coordinate::I2Array::from(vec![]);
 
         assert_eq!(
             Sokoban::new(
-                coordinate::U2::new(0, u32::MIN),
+                coordinate::I2::new(0, i32::MIN),
                 stops.clone(),
                 pushes.clone(),
                 targets.clone()
             )
             .you_move(coordinate::Direction::Up),
             Sokoban::new(
-                coordinate::U2::new(0, u32::MIN),
+                coordinate::I2::new(0, i32::MIN),
                 stops.clone(),
                 pushes.clone(),
                 targets.clone()
@@ -618,14 +618,14 @@ mod tests {
         );
         assert_eq!(
             Sokoban::new(
-                coordinate::U2::new(u32::MIN, 0),
+                coordinate::I2::new(i32::MIN, 0),
                 stops.clone(),
                 pushes.clone(),
                 targets.clone()
             )
             .you_move(coordinate::Direction::Left),
             Sokoban::new(
-                coordinate::U2::new(u32::MIN, 0),
+                coordinate::I2::new(i32::MIN, 0),
                 stops.clone(),
                 pushes.clone(),
                 targets.clone()
@@ -633,14 +633,14 @@ mod tests {
         );
         assert_eq!(
             Sokoban::new(
-                coordinate::U2::new(0, u32::MAX),
+                coordinate::I2::new(0, i32::MAX),
                 stops.clone(),
                 pushes.clone(),
                 targets.clone()
             )
             .you_move(coordinate::Direction::Down),
             Sokoban::new(
-                coordinate::U2::new(0, u32::MAX),
+                coordinate::I2::new(0, i32::MAX),
                 stops.clone(),
                 pushes.clone(),
                 targets.clone()
@@ -648,14 +648,14 @@ mod tests {
         );
         assert_eq!(
             Sokoban::new(
-                coordinate::U2::new(u32::MAX, 0),
+                coordinate::I2::new(i32::MAX, 0),
                 stops.clone(),
                 pushes.clone(),
                 targets.clone()
             )
             .you_move(coordinate::Direction::Right),
             Sokoban::new(
-                coordinate::U2::new(u32::MAX, 0),
+                coordinate::I2::new(i32::MAX, 0),
                 stops.clone(),
                 pushes.clone(),
                 targets.clone()
@@ -664,15 +664,15 @@ mod tests {
 
         assert_eq!(
             Sokoban::new(
-                coordinate::U2::new(u32::MAX - 1, 0),
+                coordinate::I2::new(i32::MAX - 1, 0),
                 stops.clone(),
-                coordinate::U2Array::from(vec![[u32::MAX, 0]]),
+                coordinate::I2Array::from(vec![[i32::MAX, 0]]),
                 targets.clone()
             ),
             Sokoban::new(
-                coordinate::U2::new(u32::MAX - 1, 0),
+                coordinate::I2::new(i32::MAX - 1, 0),
                 stops.clone(),
-                coordinate::U2Array::from(vec![[u32::MAX, 0]]),
+                coordinate::I2Array::from(vec![[i32::MAX, 0]]),
                 targets.clone()
             )
         );
@@ -682,13 +682,13 @@ mod tests {
     fn lonely_target_is_not_triggered() {
         // ..^..
         // ..@..
-        let you: coordinate::U2 = coordinate::U2::new(0, 1);
-        let pushes: coordinate::U2Array = coordinate::U2Array::from(vec![]);
-        let targets: coordinate::U2Array = coordinate::U2Array::from(vec![[0, 0]]);
-        let stops: coordinate::U2Array = coordinate::U2Array::from(vec![]);
+        let you: coordinate::I2 = coordinate::I2::new(0, 1);
+        let pushes: coordinate::I2Array = coordinate::I2Array::from(vec![]);
+        let targets: coordinate::I2Array = coordinate::I2Array::from(vec![[0, 0]]);
+        let stops: coordinate::I2Array = coordinate::I2Array::from(vec![]);
 
         let board: Sokoban = Sokoban::new(you, stops, pushes, targets);
-        assert_eq!(board.triggered_targets(), Vec::<&coordinate::U2>::new());
+        assert_eq!(board.triggered_targets(), Vec::<&coordinate::I2>::new());
         assert!(!board.all_targets_triggered());
     }
 
@@ -697,16 +697,16 @@ mod tests {
         // ..^..
         // ..0..
         // ..@..
-        let you: coordinate::U2 = coordinate::U2::new(0, 2);
-        let pushes: coordinate::U2Array = coordinate::U2Array::from(vec![[0, 1]]);
-        let targets: coordinate::U2Array = coordinate::U2Array::from(vec![[0, 0]]);
-        let stops: coordinate::U2Array = coordinate::U2Array::from(vec![]);
+        let you: coordinate::I2 = coordinate::I2::new(0, 2);
+        let pushes: coordinate::I2Array = coordinate::I2Array::from(vec![[0, 1]]);
+        let targets: coordinate::I2Array = coordinate::I2Array::from(vec![[0, 0]]);
+        let stops: coordinate::I2Array = coordinate::I2Array::from(vec![]);
 
         let board: Sokoban =
             Sokoban::new(you, stops, pushes, targets.clone()).you_move(coordinate::Direction::Up);
         assert_eq!(
             board.triggered_targets(),
-            targets.iter().collect::<Vec<&coordinate::U2>>()
+            targets.iter().collect::<Vec<&coordinate::I2>>()
         );
         assert!(board.all_targets_triggered());
     }
@@ -715,14 +715,14 @@ mod tests {
     fn target_on_you_is_not_triggered() {
         // ..^..
         // ..@..
-        let you: coordinate::U2 = coordinate::U2::new(0, 1);
-        let pushes: coordinate::U2Array = coordinate::U2Array::from(vec![]);
-        let targets: coordinate::U2Array = coordinate::U2Array::from(vec![[0, 0]]);
-        let stops: coordinate::U2Array = coordinate::U2Array::from(vec![]);
+        let you: coordinate::I2 = coordinate::I2::new(0, 1);
+        let pushes: coordinate::I2Array = coordinate::I2Array::from(vec![]);
+        let targets: coordinate::I2Array = coordinate::I2Array::from(vec![[0, 0]]);
+        let stops: coordinate::I2Array = coordinate::I2Array::from(vec![]);
 
         let board: Sokoban =
             Sokoban::new(you, stops, pushes, targets).you_move(coordinate::Direction::Up);
-        assert_eq!(board.triggered_targets(), Vec::<&coordinate::U2>::new());
+        assert_eq!(board.triggered_targets(), Vec::<&coordinate::I2>::new());
         assert!(!board.all_targets_triggered());
     }
 
@@ -733,17 +733,17 @@ mod tests {
         // ^0@0^
         // ..0..
         // ..^..
-        let you: coordinate::U2 = coordinate::U2::new(2, 2);
-        let pushes: coordinate::U2Array =
-            coordinate::U2Array::from(vec![[2, 1], [1, 2], [3, 2], [2, 3]]);
-        let targets: coordinate::U2Array =
-            coordinate::U2Array::from(vec![[2, 0], [0, 2], [2, 4], [4, 2]]);
-        let stops: coordinate::U2Array = coordinate::U2Array::from(vec![]);
+        let you: coordinate::I2 = coordinate::I2::new(2, 2);
+        let pushes: coordinate::I2Array =
+            coordinate::I2Array::from(vec![[2, 1], [1, 2], [3, 2], [2, 3]]);
+        let targets: coordinate::I2Array =
+            coordinate::I2Array::from(vec![[2, 0], [0, 2], [2, 4], [4, 2]]);
+        let stops: coordinate::I2Array = coordinate::I2Array::from(vec![]);
 
         let board: Sokoban = Sokoban::new(you, stops, pushes, targets.clone());
         assert_eq!(
             board.triggered_targets(),
-            targets.iter().take(0).collect::<Vec<&coordinate::U2>>()
+            targets.iter().take(0).collect::<Vec<&coordinate::I2>>()
         );
         assert!(!board.all_targets_triggered());
 
@@ -752,7 +752,7 @@ mod tests {
             .you_move(coordinate::Direction::Down);
         assert_eq!(
             board.triggered_targets(),
-            targets.iter().take(1).collect::<Vec<&coordinate::U2>>()
+            targets.iter().take(1).collect::<Vec<&coordinate::I2>>()
         );
         assert!(!board.all_targets_triggered());
 
@@ -761,7 +761,7 @@ mod tests {
             .you_move(coordinate::Direction::Right);
         assert_eq!(
             board.triggered_targets(),
-            targets.iter().take(2).collect::<Vec<&coordinate::U2>>()
+            targets.iter().take(2).collect::<Vec<&coordinate::I2>>()
         );
         assert!(!board.all_targets_triggered());
 
@@ -770,7 +770,7 @@ mod tests {
             .you_move(coordinate::Direction::Up);
         assert_eq!(
             board.triggered_targets(),
-            targets.iter().take(3).collect::<Vec<&coordinate::U2>>()
+            targets.iter().take(3).collect::<Vec<&coordinate::I2>>()
         );
         assert!(!board.all_targets_triggered());
 
@@ -779,33 +779,33 @@ mod tests {
             .you_move(coordinate::Direction::Left);
         assert_eq!(
             board.triggered_targets(),
-            targets.iter().collect::<Vec<&coordinate::U2>>()
+            targets.iter().collect::<Vec<&coordinate::I2>>()
         );
         assert!(board.all_targets_triggered());
     }
 
     #[test]
     fn you_are_where_you_are() {
-        let you: coordinate::U2 = coordinate::U2::new(1, 1);
-        let stops: coordinate::U2Array = coordinate::U2Array::from(vec![[2, 2], [3, 3]]);
-        let pushes: coordinate::U2Array = coordinate::U2Array::from(vec![[3, 1], [1, 3]]);
-        let targets: coordinate::U2Array = coordinate::U2Array::from(vec![[4, 1], [1, 4]]);
+        let you: coordinate::I2 = coordinate::I2::new(1, 1);
+        let stops: coordinate::I2Array = coordinate::I2Array::from(vec![[2, 2], [3, 3]]);
+        let pushes: coordinate::I2Array = coordinate::I2Array::from(vec![[3, 1], [1, 3]]);
+        let targets: coordinate::I2Array = coordinate::I2Array::from(vec![[4, 1], [1, 4]]);
 
         let board: Sokoban = Sokoban::new(you, stops, pushes, targets);
 
         assert_eq!(board.you(), you);
         assert_eq!(
             board.you_move(coordinate::Direction::Right).you(),
-            coordinate::U2::new(2, 1)
+            coordinate::I2::new(2, 1)
         );
     }
 
     #[test]
     fn stops_are_where_they_are() {
-        let you: coordinate::U2 = coordinate::U2::new(1, 1);
-        let stops: coordinate::U2Array = coordinate::U2Array::from(vec![[2, 2], [3, 3]]);
-        let pushes: coordinate::U2Array = coordinate::U2Array::from(vec![[3, 1], [1, 3]]);
-        let targets: coordinate::U2Array = coordinate::U2Array::from(vec![[4, 1], [1, 4]]);
+        let you: coordinate::I2 = coordinate::I2::new(1, 1);
+        let stops: coordinate::I2Array = coordinate::I2Array::from(vec![[2, 2], [3, 3]]);
+        let pushes: coordinate::I2Array = coordinate::I2Array::from(vec![[3, 1], [1, 3]]);
+        let targets: coordinate::I2Array = coordinate::I2Array::from(vec![[4, 1], [1, 4]]);
 
         let board: Sokoban = Sokoban::new(you, stops.clone(), pushes, targets);
 
@@ -814,10 +814,10 @@ mod tests {
 
     #[test]
     fn pushes_are_where_they_are() {
-        let you: coordinate::U2 = coordinate::U2::new(1, 1);
-        let stops: coordinate::U2Array = coordinate::U2Array::from(vec![[2, 2], [3, 3]]);
-        let pushes: coordinate::U2Array = coordinate::U2Array::from(vec![[3, 1], [1, 3]]);
-        let targets: coordinate::U2Array = coordinate::U2Array::from(vec![[4, 1], [1, 4]]);
+        let you: coordinate::I2 = coordinate::I2::new(1, 1);
+        let stops: coordinate::I2Array = coordinate::I2Array::from(vec![[2, 2], [3, 3]]);
+        let pushes: coordinate::I2Array = coordinate::I2Array::from(vec![[3, 1], [1, 3]]);
+        let targets: coordinate::I2Array = coordinate::I2Array::from(vec![[4, 1], [1, 4]]);
 
         let board: Sokoban = Sokoban::new(you, stops, pushes.clone(), targets);
 
@@ -826,10 +826,10 @@ mod tests {
 
     #[test]
     fn targets_are_where_they_are() {
-        let you: coordinate::U2 = coordinate::U2::new(1, 1);
-        let stops: coordinate::U2Array = coordinate::U2Array::from(vec![[2, 2], [3, 3]]);
-        let pushes: coordinate::U2Array = coordinate::U2Array::from(vec![[3, 1], [1, 3]]);
-        let targets: coordinate::U2Array = coordinate::U2Array::from(vec![[4, 1], [1, 4]]);
+        let you: coordinate::I2 = coordinate::I2::new(1, 1);
+        let stops: coordinate::I2Array = coordinate::I2Array::from(vec![[2, 2], [3, 3]]);
+        let pushes: coordinate::I2Array = coordinate::I2Array::from(vec![[3, 1], [1, 3]]);
+        let targets: coordinate::I2Array = coordinate::I2Array::from(vec![[4, 1], [1, 4]]);
 
         let board: Sokoban = Sokoban::new(you, stops, pushes, targets.clone());
 
@@ -852,8 +852,8 @@ mod tests {
         //    |^|
         //    ---
 
-        let you: coordinate::U2 = coordinate::U2::new(4, 4);
-        let stops: coordinate::U2Array = coordinate::U2Array::from(vec![
+        let you: coordinate::I2 = coordinate::I2::new(4, 4);
+        let stops: coordinate::I2Array = coordinate::I2Array::from(vec![
             [2, 0],
             [3, 0],
             [4, 0],
@@ -883,16 +883,16 @@ mod tests {
             [4, 7],
             [5, 7],
         ]);
-        let pushes: coordinate::U2Array =
-            coordinate::U2Array::from(vec![[3, 3], [5, 3], [3, 4], [4, 5]]);
-        let targets: coordinate::U2Array =
-            coordinate::U2Array::from(vec![[3, 1], [6, 3], [1, 4], [4, 6]]);
+        let pushes: coordinate::I2Array =
+            coordinate::I2Array::from(vec![[3, 3], [5, 3], [3, 4], [4, 5]]);
+        let targets: coordinate::I2Array =
+            coordinate::I2Array::from(vec![[3, 1], [6, 3], [1, 4], [4, 6]]);
 
         let board: Sokoban = Sokoban::new(you, stops.clone(), pushes.clone(), targets.clone());
 
         assert_eq!(
             board.you_move(coordinate::Direction::Up),
-            Sokoban::new(coordinate::U2::new(4, 3), stops, pushes, targets)
+            Sokoban::new(coordinate::I2::new(4, 3), stops, pushes, targets)
         );
 
         assert_eq!(
@@ -900,7 +900,7 @@ mod tests {
                 .you_move(coordinate::Direction::Down)
                 .you_move(coordinate::Direction::Up)
                 .triggered_targets(),
-            vec![&coordinate::U2::new(4, 6)]
+            vec![&coordinate::I2::new(4, 6)]
         );
 
         assert!(!board

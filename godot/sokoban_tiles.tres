@@ -1,12 +1,12 @@
-[gd_resource type="TileSet" load_steps=11 format=3 uid="uid://bo84ao0tgxudm"]
+[gd_resource type="TileSet" load_steps=11 format=3 uid="uid://dhsv5t2p82pfj"]
 
-[ext_resource type="Texture2D" path="res://push.png" id="1"]
-[ext_resource type="Texture2D" path="res://stop.png" id="2"]
-[ext_resource type="Texture2D" path="res://target.png" id="3"]
-[ext_resource type="Texture2D" path="res://you.png" id="4"]
-[ext_resource type="Texture2D" path="res://triggered_target.png" id="5"]
+[ext_resource type="Texture2D" uid="uid://c5nlrxjlhxiy2" path="res://push.png" id="1"]
+[ext_resource type="Texture2D" uid="uid://2renkewwy01f" path="res://stop.png" id="2"]
+[ext_resource type="Texture2D" uid="uid://corr2phf0naht" path="res://target.png" id="3"]
+[ext_resource type="Texture2D" uid="uid://chmuhsshy7om0" path="res://you.png" id="4"]
+[ext_resource type="Texture2D" uid="uid://b162ecjmehwgq" path="res://triggered_target.png" id="5"]
 
-[sub_resource type="TileSetAtlasSource" id="TileSetAtlasSource_7wyre"]
+[sub_resource type="TileSetAtlasSource" id="TileSetAtlasSource_punip"]
 texture = ExtResource("1")
 texture_region_size = Vector2i(32, 32)
 0:0/next_alternative_id = 8
@@ -31,7 +31,7 @@ texture_region_size = Vector2i(32, 32)
 0:0/7/flip_v = true
 0:0/7/transpose = true
 
-[sub_resource type="TileSetAtlasSource" id="TileSetAtlasSource_vhi2w"]
+[sub_resource type="TileSetAtlasSource" id="TileSetAtlasSource_vphlv"]
 texture = ExtResource("2")
 texture_region_size = Vector2i(32, 32)
 0:0/next_alternative_id = 8
@@ -56,7 +56,7 @@ texture_region_size = Vector2i(32, 32)
 0:0/7/flip_v = true
 0:0/7/transpose = true
 
-[sub_resource type="TileSetAtlasSource" id="TileSetAtlasSource_fccti"]
+[sub_resource type="TileSetAtlasSource" id="TileSetAtlasSource_5k32q"]
 texture = ExtResource("3")
 texture_region_size = Vector2i(32, 32)
 0:0/next_alternative_id = 8
@@ -81,7 +81,7 @@ texture_region_size = Vector2i(32, 32)
 0:0/7/flip_v = true
 0:0/7/transpose = true
 
-[sub_resource type="TileSetAtlasSource" id="TileSetAtlasSource_4hums"]
+[sub_resource type="TileSetAtlasSource" id="TileSetAtlasSource_qg0t6"]
 texture = ExtResource("5")
 texture_region_size = Vector2i(32, 32)
 0:0/next_alternative_id = 8
@@ -106,7 +106,7 @@ texture_region_size = Vector2i(32, 32)
 0:0/7/flip_v = true
 0:0/7/transpose = true
 
-[sub_resource type="TileSetAtlasSource" id="TileSetAtlasSource_b5nd4"]
+[sub_resource type="TileSetAtlasSource" id="TileSetAtlasSource_dvt4m"]
 texture = ExtResource("4")
 texture_region_size = Vector2i(32, 32)
 0:0/next_alternative_id = 8
@@ -133,8 +133,8 @@ texture_region_size = Vector2i(32, 32)
 
 [resource]
 tile_size = Vector2i(32, 32)
-sources/0 = SubResource("TileSetAtlasSource_7wyre")
-sources/1 = SubResource("TileSetAtlasSource_vhi2w")
-sources/2 = SubResource("TileSetAtlasSource_fccti")
-sources/3 = SubResource("TileSetAtlasSource_4hums")
-sources/4 = SubResource("TileSetAtlasSource_b5nd4")
+sources/0 = SubResource("TileSetAtlasSource_punip")
+sources/1 = SubResource("TileSetAtlasSource_vphlv")
+sources/2 = SubResource("TileSetAtlasSource_5k32q")
+sources/3 = SubResource("TileSetAtlasSource_qg0t6")
+sources/4 = SubResource("TileSetAtlasSource_dvt4m")
