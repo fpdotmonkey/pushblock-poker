@@ -10,6 +10,7 @@ use crate::sokoban;
 #[derive(GodotClass)]
 #[class(base=TileMap)]
 pub struct Sokoban {
+    initial_board: sokoban::Sokoban,
     board: sokoban::Sokoban,
     you_tile: i32,
     stop_tile: i32,
@@ -25,6 +26,12 @@ pub struct Sokoban {
 impl TileMapVirtual for Sokoban {
     fn init(base: Base<TileMap>) -> Self {
         Sokoban {
+            initial_board: sokoban::Sokoban::new(
+                I2::new(0, 0),
+                I2Array::from(vec![]),
+                I2Array::from(vec![]),
+                I2Array::from(vec![]),
+            ),
             board: sokoban::Sokoban::new(
                 I2::new(0, 0),
                 I2Array::from(vec![]),
@@ -41,7 +48,8 @@ impl TileMapVirtual for Sokoban {
     }
 
     fn ready(&mut self) {
-        self.board = self.initial_board();
+        self.initial_board = self.get_initial_board();
+        self.update_board(self.initial_board.clone());
     }
 
     fn input(&mut self, event: Gd<InputEvent>) {
@@ -54,6 +62,8 @@ impl TileMapVirtual for Sokoban {
                 self.update_board(self.board.you_move(Direction::Down));
             } else if event.is_action_pressed(Sokoban::MOVE_RIGHT.into()) {
                 self.update_board(self.board.you_move(Direction::Right));
+            } else if event.is_action_pressed(Sokoban::RESET.into()) {
+                self.update_board(self.initial_board.clone());
             }
         }
     }
@@ -80,8 +90,9 @@ impl Sokoban {
     pub const MOVE_DOWN: &'static str = "move_down";
     /// The [`InputMap`] key for the right input, `move_right`
     pub const MOVE_RIGHT: &'static str = "move_right";
+    pub const RESET: &'static str = "reset";
 
-    fn initial_board(&self) -> sokoban::Sokoban {
+    fn get_initial_board(&self) -> sokoban::Sokoban {
         let mut pushes = self
             .base
             .get_used_cells_by_id_ex(0)
